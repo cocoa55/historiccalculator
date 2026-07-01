@@ -1,5 +1,26 @@
+#include <cstdlib>
+
 #include <iostream>
+#include <limits>
 #include <string_view>
+
+void ignoreLine() {
+  std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+}
+
+bool clearFailedExtraction() {
+  if (!std::cin) {
+
+    if (std::cin.eof()) {
+      std::exit(0);
+    }
+
+    std::cin.clear();
+    ignoreLine();
+    return true;
+  }
+  return false;
+}
 
 char enterOp() {
   char op{};
@@ -19,10 +40,19 @@ char enterOp() {
 
 int getNumber(std::string_view order) {
 
-  int input{};
-  std::cout << "Enter the " << order << " number: ";
-  std::cin >> input;
-  return input;
+  while (true) {
+
+    int input{};
+    std::cout << "Enter the " << order << " number: ";
+    std::cin >> input;
+
+    if (clearFailedExtraction()) {
+      std::cout << "Error: Failed extraction. (Enter a valid integer, followed "
+                   "by ENTER)\n";
+      continue;
+    }
+    return input;
+  }
 }
 
 int calculate(int first) {
