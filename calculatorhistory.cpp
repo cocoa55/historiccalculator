@@ -12,6 +12,7 @@ bool clearFailedExtraction() {
   if (!std::cin) {
 
     if (std::cin.eof()) {
+      std::cerr << "\nEOF entered, exiting program.";
       std::exit(0);
     }
 
@@ -35,19 +36,19 @@ char enterOp() {
     case '/':
       return op;
     }
+    std::cout << '\n';
   }
 }
 
 int getNumber(std::string_view order) {
 
   while (true) {
-
     int input{};
     std::cout << "Enter the " << order << " number: ";
     std::cin >> input;
 
     if (clearFailedExtraction()) {
-      std::cout << "Error: Failed extraction. (Enter a valid integer, followed "
+      std::cerr << "Error: Failed extraction. (Enter a valid integer, followed "
                    "by ENTER)\n";
       continue;
     }
@@ -69,10 +70,10 @@ int calculate(int first) {
     return first - second;
   case '/':
     while (second == 0) {
-      std::cout << "Error: You cannot divide by zero try again.\n";
+      std::cerr << "Error: You cannot divide by zero try again.\n";
       second = getNumber("second");
     }
-    std::cout << "Answer: " << first / second << '\n';
+    std::cout << "Answer: " << static_cast<double>(first) / second << '\n';
     return first / second;
   case '*':
     std::cout << "Answer: " << first * second << '\n';
@@ -83,15 +84,44 @@ int calculate(int first) {
 
 bool calculateAgain() {
   char answer{};
-  std::cout << "Do you want to calculate again? (y/n)\n" << "Response: ";
   while (true) {
+    std::cout << "Do you want to calculate again? (y/n)" << "\nResponse: ";
+
     std::cin >> answer;
+    ignoreLine();
     switch (answer) {
     case 'y':
       return true;
     case 'n':
       return false;
+    default:
+      std::cerr << "Error: Enter y or n.\n";
+      continue;
     }
+  }
+}
+
+int printWithPast(int result) {
+  char response{};
+  while (true) {
+    std::cout << "Do you want to use the answer as the first number? (y/n)\n"
+              << "Response: ";
+    std::cin >> response;
+    ignoreLine();
+    switch (response) {
+    case 'y':
+      result = calculate(result);
+      break;
+    case 'n': {
+      int firstsecond{getNumber("first")};
+      result = calculate(firstsecond);
+      break;
+    }
+    default:
+      std::cerr << "Error: Enter Y or N. \n";
+      continue;
+    }
+    return result;
   }
 }
 
@@ -102,23 +132,9 @@ int main() {
   int result{calculate(first)}; // runs first calculate, and stores the result
                                 // of the first calculate call
 
-  while (bool playAgain{calculateAgain()}) {
+  while (bool goAgain{calculateAgain()}) {
 
-    if (playAgain) {
-      std::cout << "Do you want to use the answer as the first number? (y/n)\n"
-                << "Response: ";
-      char response{};
-      std::cin >> response;
-      switch (response) {
-      case 'y':
-        result = calculate(result);
-        break;
-      case 'n':
-        int firstsecond{getNumber("first")};
-        result = calculate(firstsecond);
-        break;
-      }
-    }
+    result = printWithPast(result);
   }
 
   std::cout << "come back another time.";
