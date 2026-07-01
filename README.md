@@ -43,4 +43,4 @@ Answer: 75
 
 ---
 
-*First project built after 1 month of learning C++ through learncpp.com*
+*First project built after 1 month of programming 
